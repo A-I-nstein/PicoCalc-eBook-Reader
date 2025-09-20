@@ -1,0 +1,8 @@
+[package]
+name = "converter"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+epub = "2.1.4"
+scraper = "0.24.0"
