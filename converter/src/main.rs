@@ -25,8 +25,8 @@ impl Record {
 
         bytes[0] = self.data_type;
         bytes[1] = self.id;
-        bytes[4..8].copy_from_slice(&self.offset.to_le_bytes());
-        bytes[8..12].copy_from_slice(&self.size.to_le_bytes());
+        bytes[4..8].copy_from_slice(&self.offset.to_be_bytes());
+        bytes[8..12].copy_from_slice(&self.size.to_be_bytes());
 
         bytes
     }
