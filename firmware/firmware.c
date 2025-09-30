@@ -50,7 +50,7 @@ int main()
 {
     stdio_init_all();
     picocalc_init();
-    sleep_ms(5000);
+    sleep_ms(1000);
 
     fat32_file_t file;
     fat32_open(&file, "The House of the Dead.book");
@@ -99,8 +99,22 @@ int main()
             {
                 read_buffer[bytes_read] = '\0';
                 printf("\033[2J\033[H");
+                for (int i = 0; i < bytes_read; i++)
+                {
+                    if (read_buffer[i] == '\n')
+                    {
+                        read_buffer[i] = ' ';
+                    }
+                }
                 printf("%s", read_buffer);
-                sleep_ms(5000);
+                while (true)
+                {
+                    char ch = getchar();
+                    if (ch == '\r')
+                    {
+                        break;
+                    }
+                }
             }
         }
         else
@@ -123,8 +137,22 @@ int main()
                     {
                         read_buffer[bytes_read] = '\0';
                         printf("\033[2J\033[H");
+                        for (int i = 0; i < bytes_read; i++)
+                        {
+                            if (read_buffer[i] == '\n')
+                            {
+                                read_buffer[i] = ' ';
+                            }
+                        }
                         printf("%s", read_buffer);
-                        sleep_ms(5000);
+                        while (true)
+                        {
+                            char ch = getchar();
+                            if (ch == '\r')
+                            {
+                                break;
+                            }
+                        }
                     }
                 }
                 else
@@ -139,8 +167,22 @@ int main()
                     {
                         read_buffer[bytes_read] = '\0';
                         printf("\033[2J\033[H");
+                        for (int i = 0; i < bytes_read; i++)
+                        {
+                            if (read_buffer[i] == '\n')
+                            {
+                                read_buffer[i] = ' ';
+                            }
+                        }
                         printf("%s", read_buffer);
-                        sleep_ms(5000);
+                        while (true)
+                        {
+                            char ch = getchar();
+                            if (ch == '\r')
+                            {
+                                break;
+                            }
+                        }
                     }
                 }
 
