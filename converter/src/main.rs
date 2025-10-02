@@ -8,6 +8,41 @@ use epub::doc::EpubDoc;
 use scraper::{Html, Selector};
 
 const RECORD_SIZE: usize = 16;
+const METADATA_FIELD_SIZE: usize = 64;
+const METADATA_TOTAL_SIZE: usize = 5 * METADATA_FIELD_SIZE;
+
+#[derive(Debug)]
+struct MetadataHeader {
+    title: String,
+    creator: String,
+    language: String,
+    publisher: String,
+    description: String,
+}
+
+impl MetadataHeader {
+    fn to_bytes(&self) -> Vec<u8> {
+        let mut bytes = Vec::with_capacity(METADATA_TOTAL_SIZE);
+
+        let mut string_to_fixed_bytes = |s: &String| {
+            let s_bytes = s.as_bytes();
+            let len = s_bytes.len().min(METADATA_FIELD_SIZE);
+            bytes.extend_from_slice(&s_bytes[..len]);
+
+            if len < METADATA_FIELD_SIZE {
+                bytes.extend(vec![0; METADATA_FIELD_SIZE - len]);
+            }
+        };
+
+        string_to_fixed_bytes(&self.title);
+        string_to_fixed_bytes(&self.creator);
+        string_to_fixed_bytes(&self.language);
+        string_to_fixed_bytes(&self.publisher);
+        string_to_fixed_bytes(&self.description);
+
+        bytes
+    }
+}
 
 #[derive(Debug)]
 struct Record {
@@ -34,7 +69,7 @@ impl Record {
 
 #[derive(Debug)]
 pub struct Book {
-    title: String,
+    metadata: MetadataHeader,
     header: Vec<Record>,
     body: Vec<String>,
     epub_doc: EpubDoc<BufReader<File>>,
@@ -43,11 +78,25 @@ pub struct Book {
 impl Book {
     pub fn new(path_to_file: &str) -> Result<Self, Box<dyn Error>> {
         let epub_doc = EpubDoc::new(path_to_file)?;
-        let title = epub_doc
-            .mdata("title")
-            .ok_or("Could not find book title.")?;
+
+        let get_mdata = |key: &str| -> String { epub_doc.mdata(key).unwrap_or_default() };
+
+        let metadata = MetadataHeader {
+            title: get_mdata("title"),
+            creator: get_mdata("creator"),
+            language: get_mdata("language"),
+            publisher: get_mdata("publisher"),
+            description: get_mdata("description"),
+        };
+
+        if metadata.title.is_empty() {
+            return Err(Box::from(
+                "Could not find book title (dc:title metadata is missing).",
+            ));
+        }
+
         Ok(Self {
-            title,
+            metadata,
             header: Vec::new(),
             body: Vec::new(),
             epub_doc,
@@ -56,7 +105,7 @@ impl Book {
 
     fn parse(&mut self) -> Result<(), Box<dyn Error>> {
         let num_pages = self.epub_doc.get_num_pages();
-        let mut current_offset = (num_pages * RECORD_SIZE) as u32;
+        let mut current_offset = (num_pages * RECORD_SIZE) as u32 + METADATA_TOTAL_SIZE as u32;
         let content_selector = Selector::parse("p, h1, h2, h3, h4, h5, h6, li")?;
 
         for id in 0..num_pages {
@@ -94,17 +143,21 @@ impl Book {
     }
 
     pub fn convert(&mut self) -> Result<(), Box<dyn Error>> {
-        let output_file_path = self.title.clone() + ".book";
+        let output_file_path = self.metadata.title.clone() + ".book";
         let mut output = File::create(&output_file_path)?;
 
         println!("Started parsing the file.");
         self.parse()?;
         println!("Completed parsing the file.");
 
+        output.write_all(&self.metadata.to_bytes())?;
+        println!("Wrote meta-data header to {output_file_path}",);
+
         for record in &self.header {
             output.write_all(&record.to_bytes())?;
         }
         println!("Wrote header to {output_file_path}",);
+
         for text in &self.body {
             output.write_all(text.as_bytes())?;
         }
