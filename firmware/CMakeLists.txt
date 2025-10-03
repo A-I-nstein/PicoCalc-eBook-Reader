@@ -36,7 +36,11 @@ pico_sdk_init()
 # Add executable. Default name is the project name, version 0.1
 
 add_executable(firmware 
-    firmware.c 
+        firmware.c
+        src/book_parser.c
+        src/viewer.c
+        include/book_parser.h
+        include/viewer.h
         drivers/audio.c
         drivers/audio.h
         drivers/clib.c
