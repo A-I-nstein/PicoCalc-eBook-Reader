@@ -62,3 +62,16 @@ bool display_section(fat32_file_t *file, const header_block *block)
     }
     return true;
 }
+
+bool display_metadata(const metadata_block *block)
+{
+    printf("\033[2J\033[H");
+    printf("Title      : %s\n", block->title);
+    printf("Creator    : %.64s\n", block->creator);
+    printf("Language   : %.64s\n", block->language);
+    printf("Publisher  : %.64s\n", block->publisher);
+    printf("Description: %.64s\n", block->description);
+    printf("\nPress Enter to continue...\n");
+    wait_for_enter();
+    return true;
+}

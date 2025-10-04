@@ -7,3 +7,4 @@
 #define SCREEN_AREA (SCREEN_SIZE_X * SCREEN_SIZE_Y)
 
 bool display_section(fat32_file_t *file, const header_block *block);
+bool display_metadata(const metadata_block *block);

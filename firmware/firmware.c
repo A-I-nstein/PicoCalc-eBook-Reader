@@ -18,6 +18,7 @@ int main()
 
     fat32_file_t file;
     header_block *headers = NULL;
+    metadata_block metadata;
 
     if (fat32_open(&file, "The House of the Dead.book") != FAT32_OK)
     {
@@ -26,7 +27,19 @@ int main()
     }
 
     size_t bytes_read;
+    char metadata_buffer[METADATA_BLOCK_SIZE];
     char read_buffer[HEADER_BLOCK_SIZE];
+
+    if (fat32_read(&file, metadata_buffer, METADATA_BLOCK_SIZE, &bytes_read) != FAT32_OK)
+    {
+        printf("Error: Failed to parse book metadata.\n");
+        goto cleanup;
+    }
+    else
+    {
+        extract_metadata_block(&metadata, &metadata_buffer[0]);
+        display_metadata(&metadata);
+    }
 
     if (fat32_read(&file, read_buffer, HEADER_BLOCK_SIZE, &bytes_read) != FAT32_OK)
     {

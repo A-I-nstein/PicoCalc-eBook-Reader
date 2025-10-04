@@ -1,9 +1,11 @@
 #include <stdio.h>
+#include <string.h>
 #include <pico/stdlib.h>
 
 #include "include/book_parser.h"
 
 const size_t HEADER_BLOCK_SIZE = 16;
+const size_t METADATA_BLOCK_SIZE = 320;
 
 static uint32_t be_bytes_to_uint32(const uint8_t *bytes)
 {
@@ -23,6 +25,20 @@ void extract_header_block(header_block *block, const uint8_t *bytes)
     block->section_id = bytes[1];
     block->offset = be_bytes_to_uint32(&bytes[4]);
     block->size = be_bytes_to_uint32(&bytes[8]);
+}
+
+void extract_metadata_block(metadata_block *block, const uint8_t *bytes)
+{
+    memcpy(block->title, &bytes[0], 64);
+    block->title[63] = '\0';
+    memcpy(block->creator, &bytes[64], 64);
+    block->creator[63] = '\0';
+    memcpy(block->language, &bytes[128], 64);
+    block->language[63] = '\0';
+    memcpy(block->publisher, &bytes[192], 64);
+    block->publisher[63] = '\0';
+    memcpy(block->description, &bytes[256], 64);
+    block->description[63] = '\0';
 }
 
 bool parse_remaining_headers(fat32_file_t *file, header_block *headers, size_t no_of_header_blocks)
