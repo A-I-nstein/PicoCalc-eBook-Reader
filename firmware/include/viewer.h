@@ -6,5 +6,10 @@
 #define SCREEN_SIZE_Y 32
 #define SCREEN_AREA (SCREEN_SIZE_X * SCREEN_SIZE_Y)
 
+#define MAX_BOOK_FILES 9
+#define MAX_FILENAME_LEN 256
+
 bool display_section(fat32_file_t *file, const header_block *block);
 bool display_metadata(const metadata_block *block);
+size_t get_book_files(char file_names[MAX_BOOK_FILES][MAX_FILENAME_LEN]);
+int select_book(const char file_names[MAX_BOOK_FILES][MAX_FILENAME_LEN], size_t count);

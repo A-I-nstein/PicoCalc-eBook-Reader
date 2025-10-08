@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include <pico/stdlib.h>
 
@@ -74,4 +75,60 @@ bool display_metadata(const metadata_block *block)
     printf("\nPress Enter to continue...\n");
     wait_for_enter();
     return true;
+}
+
+size_t get_book_files(char filenames[][MAX_FILENAME_LEN])
+{
+    fat32_file_t dir;
+    fat32_entry_t dir_entry;
+    size_t count = 0;
+
+    if (fat32_open(&dir, ".") != FAT32_OK)
+        return 0;
+
+    do
+    {
+        if (fat32_dir_read(&dir, &dir_entry) != FAT32_OK)
+            break;
+        if (dir_entry.filename[0] && strstr(dir_entry.filename, ".book") != NULL)
+        {
+            strncpy(filenames[count], dir_entry.filename, MAX_FILENAME_LEN - 1);
+            filenames[count][MAX_FILENAME_LEN - 1] = '\0';
+            count++;
+            if (count >= MAX_BOOK_FILES)
+                break;
+        }
+    } while (dir_entry.filename[0]);
+
+    fat32_close(&dir);
+    return count;
+}
+
+int select_book(const char filenames[][MAX_FILENAME_LEN], size_t count)
+{
+    printf("\033[2J\033[H");
+    printf("Available .book files:\n");
+    for (size_t i = 0; i < count; i++)
+    {
+        printf("%zu: %s\n", i + 1, filenames[i]);
+    }
+    printf("Select a book by number: ");
+
+    int choice = 0;
+    int ch = 0;
+    while (1)
+    {
+        ch = getchar();
+        printf("%c\n", ch);
+        if (ch >= '1' && ch <= '9')
+        {
+            choice = ch - '0';
+            if (choice >= 1 && (size_t)choice <= count)
+                printf("\nPress Enter to continue...\n");
+                break;
+        }
+        printf("\nInvalid selection. Try again: ");
+    }
+    while (ch != '\n' && ch != '\r') ch = getchar();
+    return choice - 1;
 }

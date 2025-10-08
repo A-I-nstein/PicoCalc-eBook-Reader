@@ -20,7 +20,18 @@ int main()
     header_block *headers = NULL;
     metadata_block metadata;
 
-    if (fat32_open(&file, "The House of the Dead.book") != FAT32_OK)
+    char book_filenames[MAX_BOOK_FILES][MAX_FILENAME_LEN];
+    size_t book_count = get_book_files(book_filenames);
+
+    if (book_count == 0)
+    {
+        printf("Error: No .book files found.\n");
+        return -1;
+    }
+
+    int selected = select_book(book_filenames, book_count);
+
+    if (fat32_open(&file, book_filenames[selected]) != FAT32_OK)
     {
         printf("Error: Failed to the open book file.\n");
         return -1;
@@ -80,7 +91,7 @@ int main()
 cleanup:
     if (headers != NULL)
     {
-        free(headers); // Free the dynamically allocated memory
+        free(headers);
     }
     fat32_close(&file);
     printf("Book closed.\n");
