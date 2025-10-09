@@ -16,6 +16,27 @@ pub struct Book {
     epub_doc: EpubDoc<BufReader<File>>,
 }
 
+fn extract_all_text(html_content: &str) -> String {
+    let document = Html::parse_document(html_content);
+
+    let selector = Selector::parse("body").unwrap();
+
+    if let Some(body) = document.select(&selector).next() {
+        let all_text = body.text().collect::<Vec<_>>().join(" ");
+        let standardized_text = all_text.replace('\u{a0}', " ");
+        return standardized_text;
+    }
+
+    document
+        .root_element()
+        .text()
+        .collect::<Vec<_>>()
+        .join(" ")
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
 impl Book {
     pub fn convert(&mut self) -> Result<(), Box<dyn Error>> {
         let output_file_path = self.metadata.title.clone() + ".book";
@@ -57,7 +78,7 @@ impl Book {
             creator: get_mdata("creator"),
             language: get_mdata("language"),
             publisher: get_mdata("publisher"),
-            description: get_mdata("description"),
+            description: extract_all_text(&get_mdata("description")),
         };
 
         if metadata.title.is_empty() {
