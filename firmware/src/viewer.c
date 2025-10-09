@@ -7,11 +7,19 @@
 
 static char text_buffer[SCREEN_AREA + 1];
 
-void wait_for_enter()
+bool wait_for_enter()
 {
-    while (getchar() != '\r')
+    while (true)
     {
-        tight_loop_contents();
+        int ch = getchar();
+        if (ch == '\r')
+        {
+            return true;
+        }
+        else if (ch == 'q')
+        {
+            return false;
+        }
     }
 }
 
@@ -57,7 +65,10 @@ bool display_section(fat32_file_t *file, const header_block *block)
             prepare_buffer_for_display(bytes_read);
             printf("\033[2J\033[H");
             printf("%s", text_buffer);
-            wait_for_enter();
+            if (!wait_for_enter())
+            {
+                return false;
+            }
         }
         current_pos += bytes_to_read;
     }

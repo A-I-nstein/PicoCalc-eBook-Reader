@@ -20,6 +20,7 @@ int main()
     header_block *headers = NULL;
     metadata_block metadata;
 
+startup:
     printf("\033[2J\033[H"); // Clear screen
     printf("************************************\n");
     printf("*      Welcome to eBook Reader     *\n");
@@ -88,8 +89,8 @@ int main()
         {
             if (!display_section(&file, &headers[x]))
             {
-                printf("Error: Failed to display section %zu.\n", x);
-                break;
+                printf("Failed to display next section %zu.\n", x);
+                goto startup;
             }
         }
     }
