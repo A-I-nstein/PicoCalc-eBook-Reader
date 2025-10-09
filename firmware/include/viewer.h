@@ -9,6 +9,7 @@
 #define MAX_BOOK_FILES 9
 #define MAX_FILENAME_LEN 256
 
+void wait_for_enter();
 bool display_section(fat32_file_t *file, const header_block *block);
 bool display_metadata(const metadata_block *block);
 size_t get_book_files(char file_names[MAX_BOOK_FILES][MAX_FILENAME_LEN]);

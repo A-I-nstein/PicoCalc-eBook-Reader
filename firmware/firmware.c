@@ -20,6 +20,12 @@ int main()
     header_block *headers = NULL;
     metadata_block metadata;
 
+    printf("\033[2J\033[H"); // Clear screen
+    printf("************************************\n");
+    printf("*      Welcome to eBook Reader     *\n");
+    printf("*      Developed by A-I-nstein     *\n");
+    printf("************************************\n");
+
     char book_filenames[MAX_BOOK_FILES][MAX_FILENAME_LEN];
     size_t book_count = get_book_files(book_filenames);
 

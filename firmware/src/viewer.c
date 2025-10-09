@@ -7,7 +7,7 @@
 
 static char text_buffer[SCREEN_AREA + 1];
 
-static void wait_for_enter()
+void wait_for_enter()
 {
     while (getchar() != '\r')
     {
@@ -67,6 +67,7 @@ bool display_section(fat32_file_t *file, const header_block *block)
 bool display_metadata(const metadata_block *block)
 {
     printf("\033[2J\033[H");
+    printf("About Book:\n\n");
     printf("Title      : %s\n", block->title);
     printf("Creator    : %.64s\n", block->creator);
     printf("Language   : %.64s\n", block->language);
@@ -106,29 +107,35 @@ size_t get_book_files(char filenames[][MAX_FILENAME_LEN])
 
 int select_book(const char filenames[][MAX_FILENAME_LEN], size_t count)
 {
-    printf("\033[2J\033[H");
-    printf("Available .book files:\n");
+    printf("\nAvailable .book files:\n");
     for (size_t i = 0; i < count; i++)
     {
         printf("%zu: %s\n", i + 1, filenames[i]);
     }
-    printf("Select a book by number: ");
 
-    int choice = 0;
-    int ch = 0;
-    while (1)
+    int choice = -1;
+    int ch;
+
+    while (choice == -1)
     {
+        printf("\nSelect a book by number: ");
         ch = getchar();
         printf("%c\n", ch);
+
         if (ch >= '1' && ch <= '9')
         {
-            choice = ch - '0';
-            if (choice >= 1 && (size_t)choice <= count)
-                printf("\nPress Enter to continue...\n");
-                break;
+            int temp_choice = ch - '0';
+            if ((size_t)temp_choice >= 1 && (size_t)temp_choice <= count)
+            {
+                choice = temp_choice;
+            }
         }
-        printf("\nInvalid selection. Try again: ");
+
+        if (choice == -1)
+        {
+            printf("\nInvalid selection. Try again.\n");
+        }
     }
-    while (ch != '\n' && ch != '\r') ch = getchar();
+
     return choice - 1;
 }
