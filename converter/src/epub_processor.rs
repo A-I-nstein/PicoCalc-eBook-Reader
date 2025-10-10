@@ -111,11 +111,16 @@ impl Book {
                 .select(&content_selector)
                 .filter_map(|element| {
                     let text = element.text().collect::<Vec<_>>().join(" ");
-                    let trimmed_text = text.trim();
-                    if trimmed_text.is_empty() {
+                    let normalized_text: String =
+                        text.split_whitespace().collect::<Vec<_>>().join(" ");
+                    if normalized_text.is_empty() {
                         None
                     } else {
-                        Some(format!("{}\n", trimmed_text))
+                        if element.value().name() == "p" {
+                            Some(format!("\t{}\n", normalized_text))
+                        } else {
+                            Some(format!("{}\n", normalized_text))
+                        }
                     }
                 })
                 .collect();

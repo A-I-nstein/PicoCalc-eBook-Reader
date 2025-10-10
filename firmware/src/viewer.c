@@ -26,13 +26,13 @@ bool wait_for_enter()
 static void prepare_buffer_for_display(size_t bytes_read)
 {
     text_buffer[bytes_read] = '\0';
-    for (size_t i = 0; i < bytes_read; i++)
-    {
-        if (text_buffer[i] == '\n')
-        {
-            text_buffer[i] = ' ';
-        }
-    }
+    // for (size_t i = 0; i < bytes_read; i++)
+    // {
+    //     if (text_buffer[i] == '\n')
+    //     {
+    //         text_buffer[i] = ' ';
+    //     }
+    // }
 }
 
 bool display_section(fat32_file_t *file, const header_block *block)
