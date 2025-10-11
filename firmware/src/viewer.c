@@ -5,8 +5,6 @@
 
 #include "include/viewer.h"
 
-static char text_buffer[SCREEN_AREA + 1];
-
 bool wait_for_enter()
 {
     while (true)
@@ -23,18 +21,6 @@ bool wait_for_enter()
     }
 }
 
-static void prepare_buffer_for_display(size_t bytes_read)
-{
-    text_buffer[bytes_read] = '\0';
-    // for (size_t i = 0; i < bytes_read; i++)
-    // {
-    //     if (text_buffer[i] == '\n')
-    //     {
-    //         text_buffer[i] = ' ';
-    //     }
-    // }
-}
-
 bool display_section(fat32_file_t *file, const header_block *block)
 {
     size_t bytes_read;
@@ -48,30 +34,46 @@ bool display_section(fat32_file_t *file, const header_block *block)
 
     while (current_pos < block->size)
     {
-        uint32_t bytes_to_read = block->size - current_pos;
+        char text_buffer[1];
+        int text_screen_cur_pos = 0;
+        char text_screen[SCREEN_AREA];
 
-        if (bytes_to_read > SCREEN_AREA)
+        for (int x = 0; x < SCREEN_AREA - 1; x++)
         {
-            bytes_to_read = SCREEN_AREA;
-        }
-
-        if (fat32_read(file, text_buffer, bytes_to_read, &bytes_read) != FAT32_OK)
-        {
-            printf("Error: Failed to parse block.\n");
-            return false;
-        }
-        else
-        {
-            prepare_buffer_for_display(bytes_read);
-            printf("\033[2J\033[H");
-            printf("%s", text_buffer);
-            if (!wait_for_enter())
+            if (text_screen_cur_pos >= block->size)
             {
+                break;
+            }
+            if (fat32_read(file, text_buffer, 1, &bytes_read) != FAT32_OK)
+            {
+                printf("Error: Failed to parse block.\n");
                 return false;
             }
+            else
+            {
+                text_screen[text_screen_cur_pos] = text_buffer[0];
+                text_screen_cur_pos += 1;
+                if (text_buffer[0] == '\n')
+                {
+                    x += SCREEN_SIZE_X - (x % SCREEN_SIZE_X);
+                }
+                else if (text_buffer[0] == '\t')
+                {
+                    x += 8;
+                }
+            }
+            current_pos += 1;
         }
-        current_pos += bytes_to_read;
+
+        text_screen[text_screen_cur_pos] = '\0';
+        printf("\033[2J\033[H");
+        printf("%s", text_screen);
+        if (!wait_for_enter())
+        {
+            return false;
+        }
     }
+
     return true;
 }
 
