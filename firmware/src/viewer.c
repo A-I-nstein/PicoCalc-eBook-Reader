@@ -21,48 +21,53 @@ bool wait_for_enter()
     }
 }
 
-bool display_section(fat32_file_t *file, const header_block *block)
-{
-    size_t bytes_read;
-    uint32_t current_pos = 0;
+bool display_file(fat32_file_t *file, const uint32_t start_pos, const uint32_t end_pos)
 
-    if (fat32_seek(file, block->offset) != FAT32_OK)
+{
+    uint32_t current_pos = start_pos;
+    size_t bytes_read;
+    char text_buffer[1];
+
+    if (fat32_seek(file, start_pos) != FAT32_OK)
     {
-        printf("Error: Unable to seek file location");
+        printf("Error: Unable to seek file start location");
         return false;
     }
 
-    while (current_pos < block->size)
+    while (current_pos < end_pos)
     {
-        char text_buffer[1];
         int text_screen_cur_pos = 0;
-        char text_screen[SCREEN_AREA];
+        char text_screen[SCREEN_AREA + 1];
 
         for (int x = 0; x < SCREEN_AREA - 1; x++)
         {
-            if (text_screen_cur_pos >= block->size)
-            {
-                break;
-            }
             if (fat32_read(file, text_buffer, 1, &bytes_read) != FAT32_OK)
             {
-                printf("Error: Failed to parse block.\n");
+                printf("Error: Failed to read text at %d location.\n", current_pos);
                 return false;
             }
             else
             {
-                text_screen[text_screen_cur_pos] = text_buffer[0];
-                text_screen_cur_pos += 1;
-                if (text_buffer[0] == '\n')
+                current_pos += 1;
+
+                if (text_buffer[0] == '\f')
                 {
-                    x += SCREEN_SIZE_X - (x % SCREEN_SIZE_X);
+                    break;
                 }
-                else if (text_buffer[0] == '\t')
+                else
                 {
-                    x += 8;
+                    text_screen[text_screen_cur_pos] = text_buffer[0];
+                    text_screen_cur_pos += 1;
+                    if (text_buffer[0] == '\n')
+                    {
+                        x += SCREEN_SIZE_X - (x % SCREEN_SIZE_X);
+                    }
+                    else if (text_buffer[0] == '\t')
+                    {
+                        x += 8;
+                    }
                 }
             }
-            current_pos += 1;
         }
 
         text_screen[text_screen_cur_pos] = '\0';

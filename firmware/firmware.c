@@ -85,13 +85,14 @@ startup:
             printf("Error: Failed to parse book headers.\n");
             goto cleanup;
         }
-        for (size_t x = 0; x < no_of_header_blocks; x++)
+
+        uint32_t start_pos = headers[0].offset;
+        uint32_t end_pos = headers[no_of_header_blocks - 1].offset + headers[no_of_header_blocks - 1].size;
+
+        if (!display_file(&file, start_pos, end_pos))
         {
-            if (!display_section(&file, &headers[x]))
-            {
-                printf("Failed to display next section %zu.\n", x);
-                goto startup;
-            }
+            printf("Failed to display file.\n");
+            goto startup;
         }
     }
 

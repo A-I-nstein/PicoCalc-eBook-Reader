@@ -107,7 +107,7 @@ impl Book {
 
             let html_document = Html::parse_document(&raw_page_content);
 
-            let document_text: String = html_document
+            let mut document_text: String = html_document
                 .select(&content_selector)
                 .filter_map(|element| {
                     let text = element.text().collect::<Vec<_>>().join(" ");
@@ -124,6 +124,8 @@ impl Book {
                     }
                 })
                 .collect();
+            
+            document_text = format!("{}\x0C", document_text);
 
             let text_size = document_text.len() as u32;
             self.header.push(Record {
