@@ -22,63 +22,91 @@ bool wait_for_enter()
 }
 
 bool display_file(fat32_file_t *file, const uint32_t start_pos, const uint32_t end_pos)
-
 {
-    uint32_t current_pos = start_pos;
-    size_t bytes_read;
-    char text_buffer[1];
+    uint32_t current_file_pos = start_pos;
 
-    if (fat32_seek(file, start_pos) != FAT32_OK)
+    while (current_file_pos < end_pos)
     {
-        printf("Error: Unable to seek file start location");
-        return false;
-    }
-
-    while (current_pos < end_pos)
-    {
-        int text_screen_cur_pos = 0;
-        char text_screen[SCREEN_AREA + 1];
-
-        for (int x = 0; x < SCREEN_AREA - 1; x++)
+        if (fat32_seek(file, current_file_pos) != FAT32_OK)
         {
-            if (fat32_read(file, text_buffer, 1, &bytes_read) != FAT32_OK)
+            printf("Error: Unable to seek file location: %u\n", current_file_pos);
+            return false;
+        }
+
+        char buffer_text[SCREEN_AREA + 1];
+        size_t bytes_to_read = SCREEN_AREA;
+        size_t bytes_read;
+
+        if ((current_file_pos + SCREEN_AREA) > end_pos)
+        {
+            bytes_to_read = end_pos - current_file_pos;
+        }
+
+        if (fat32_read(file, buffer_text, bytes_to_read, &bytes_read) != FAT32_OK)
+        {
+            printf("Error: Failed to read text at %u location.\n", current_file_pos);
+            return false;
+        }
+
+        if (bytes_read == 0)
+        {
+            break;
+        }
+
+        char screen_text[SCREEN_AREA + 1];
+        memset(screen_text, 0, sizeof(screen_text));
+
+        size_t screen_char_count = 0;
+        size_t screen_idx = 0;
+        size_t file_bytes_processed = 0;
+
+        for (int i = 0; i < bytes_read; i++)
+        {
+            file_bytes_processed++;
+            char current_char = buffer_text[i];
+            size_t projected_count = screen_char_count;
+
+            if (current_char == '\f')
             {
-                printf("Error: Failed to read text at %d location.\n", current_pos);
-                return false;
+                break;
+            }
+            else if (current_char == '\n')
+            {
+                projected_count += SCREEN_SIZE_X - (screen_char_count % SCREEN_SIZE_X);
+            }
+            else if (current_char == '\t')
+            {
+                projected_count += 8 - (screen_char_count % 8);
             }
             else
             {
-                current_pos += 1;
+                projected_count++;
+            }
 
-                if (text_buffer[0] == '\f')
-                {
-                    break;
-                }
-                else
-                {
-                    text_screen[text_screen_cur_pos] = text_buffer[0];
-                    text_screen_cur_pos += 1;
-                    if (text_buffer[0] == '\n')
-                    {
-                        x += SCREEN_SIZE_X - (x % SCREEN_SIZE_X);
-                    }
-                    else if (text_buffer[0] == '\t')
-                    {
-                        x += 8;
-                    }
-                }
+            if (projected_count > SCREEN_AREA)
+            {
+                file_bytes_processed--;
+                break;
+            }
+
+            screen_text[screen_idx++] = current_char;
+            screen_char_count = projected_count;
+        }
+        screen_text[screen_idx] = '\0';
+
+        printf("\033[2J\033[H");
+        printf("%s", screen_text);
+
+        current_file_pos += file_bytes_processed;
+
+        if (current_file_pos < end_pos)
+        {
+            if (!wait_for_enter())
+            {
+                return false;
             }
         }
-
-        text_screen[text_screen_cur_pos] = '\0';
-        printf("\033[2J\033[H");
-        printf("%s", text_screen);
-        if (!wait_for_enter())
-        {
-            return false;
-        }
     }
-
     return true;
 }
 
