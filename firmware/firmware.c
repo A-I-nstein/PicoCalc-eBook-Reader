@@ -89,7 +89,7 @@ startup:
         uint32_t start_pos = headers[0].offset;
         uint32_t end_pos = headers[no_of_header_blocks - 1].offset + headers[no_of_header_blocks - 1].size;
 
-        if (!display_file(&file, start_pos, end_pos))
+        if (!display_file(&file, start_pos, end_pos, headers, no_of_header_blocks))
         {
             printf("Failed to display file.\n");
             goto startup;

@@ -5,23 +5,31 @@
 
 #include "include/viewer.h"
 
-bool wait_for_enter()
+char wait_for_action()
 {
     while (true)
     {
         int ch = getchar();
         if (ch == '\r')
         {
-            return true;
+            return 'f';
         }
         else if (ch == 'q')
         {
-            return false;
+            return 'q';
+        }
+        else if (ch == ',')
+        {
+            return ',';
+        }
+        else if (ch == '.')
+        {
+            return '.';
         }
     }
 }
 
-bool display_file(fat32_file_t *file, const uint32_t start_pos, const uint32_t end_pos)
+bool display_file(fat32_file_t *file, const uint32_t start_pos, const uint32_t end_pos, header_block *headers, size_t no_of_h_blocks)
 {
     uint32_t current_file_pos = start_pos;
 
@@ -101,9 +109,36 @@ bool display_file(fat32_file_t *file, const uint32_t start_pos, const uint32_t e
 
         if (current_file_pos < end_pos)
         {
-            if (!wait_for_enter())
+            char action = wait_for_action();
+            if (action == 'q')
             {
                 return false;
+            }
+            else if (action == ',')
+            {
+                for (int m = no_of_h_blocks - 1; m >= 0; m--)
+                {
+                    if (headers[m].offset < current_file_pos)
+                    {
+                        if (m > 0)
+                        {
+                            current_file_pos = headers[m-1].offset;
+                            break;
+                        }
+                        current_file_pos = headers[m].offset;
+                    }
+                }
+            }
+            else if (action == '.')
+            {
+                for (size_t m = 0; m < no_of_h_blocks; m++)
+                {
+                    if (headers[m].offset > current_file_pos)
+                    {
+                        current_file_pos = headers[m].offset;
+                        break;
+                    }
+                }
             }
         }
     }
@@ -120,7 +155,7 @@ bool display_metadata(const metadata_block *block)
     printf("Publisher  : %.64s\n", block->publisher);
     printf("Description: %.64s\n", block->description);
     printf("\nPress Enter to continue...\n");
-    wait_for_enter();
+    wait_for_action();
     return true;
 }
 
