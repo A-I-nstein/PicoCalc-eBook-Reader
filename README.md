@@ -81,7 +81,11 @@ Each field is stored as a fixed-length UTF-8 byte array.
 
 ### Releases
 
-Pre-built release versions of the converter and firmware will be made available on the GitHub Releases page. You can download the latest binaries and firmware images from there for easier setup and deployment.
+Pre-built release versions of the converter and firmware is available on the [GitHub Releases](https://github.com/A-I-nstein/PicoCalc-eBook-Reader/releases) page. You can download the latest binaries and firmware images from there for easier setup and deployment. 
+- Run `converter.exe` and follow instructions to convert a `.epub` file to `.book` file.
+- Copy the `.book` file to your PicoCalc's SD card.
+- Connect your PicoCalc in BOOTSEL mode to your computer and copy the `firmware.uf2` file to it.
+- Remove the PicoCalc from your computer and turn it on.
 
 ### Build
 
