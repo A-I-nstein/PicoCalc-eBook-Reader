@@ -38,9 +38,8 @@ fn extract_all_text(html_content: &str) -> String {
 }
 
 impl Book {
-    pub fn convert(&mut self) -> Result<(), Box<dyn Error>> {
-        let output_file_path = self.metadata.title.clone() + ".book";
-        let mut output = File::create(&output_file_path)?;
+    pub fn convert_to(&mut self, output_file_path: &str) -> Result<(), Box<dyn Error>> {
+        let mut output = File::create(output_file_path)?;
 
         eprintln!("Started parsing the file.");
         self.parse()?;
@@ -124,7 +123,7 @@ impl Book {
                     }
                 })
                 .collect();
-            
+
             document_text = format!("{}\x0C", document_text);
 
             let text_size = document_text.len() as u32;

@@ -23,7 +23,7 @@ int main()
 startup:
     printf("\033[2J\033[H"); // Clear screen
     printf("************************************\n");
-    printf("*      Welcome to eBook Reader     *\n");
+    printf("* Welcome to PicoCalc eBook Reader *\n");
     printf("*      Developed by A-I-nstein     *\n");
     printf("************************************\n");
 

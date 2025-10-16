@@ -2,9 +2,9 @@
 
 ## Overview
 
-**eBook Reader** is a multi-component project for converting, storing, and reading eBooks in a custom `.book` format, optimized for embedded devices—specifically the **PicoCalc** from [Clockwork Pi](https://clockworkpi.com/). The project is written in Rust (converter) and C (firmware/reader).
+**PicoCalc eBook Reader** is a multi-component project for converting, storing, and reading eBooks in a custom `.book` format, optimized for embedded devices—specifically the **PicoCalc** from [Clockwork Pi](https://clockworkpi.com/). The project is written in Rust (converter) and C (firmware/reader).
 
-This project is built on top of [BlairLeduc/picocalc-text-starter](https://github.com/BlairLeduc/picocalc-text-starter/tree/main), which serves as the base driver for hardware support.
+This project is built on top of [BlairLeduc/picocalc-text-starter](https://github.com/BlairLeduc/picocalc-text-starter/tree/main), which serves as the base driver for hardware support (./firmware/drivers).
 
 ## Components
 
@@ -88,7 +88,8 @@ Pre-built release versions of the converter and firmware will be made available 
 #### Convert an EPUB to .book
 
 ```sh
-cargo run --bin converter path/to/input.epub path/to/output.book
+cd converter
+cargo run --release
 ```
 
 #### Flash and Run Firmware
