@@ -1,4 +1,4 @@
-# PicoCalc eBook Reader
+# PicoCalc eBook Reader (Pico 2W)
 
 ## Overview
 
