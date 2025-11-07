@@ -40,7 +40,8 @@ This project is built on top of [BlairLeduc/picocalc-text-starter](https://githu
 - Display cover pages and images.
 - Show battery and pages remaining, time to complete section/book.
 - Bookmarks.
-- Increase book limits
+- Increase book limits.
+- Collections.
 
 ## .book File Format
 
