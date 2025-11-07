@@ -39,7 +39,7 @@ This project is built on top of [BlairLeduc/picocalc-text-starter](https://githu
 - Support for ASCII control characters and new features.
 - Display cover pages and images.
 - Show battery and pages remaining, time to complete section/book.
-- Bookmarks.
+- Bookmarks, last read page/book.
 - Increase book limits.
 - Collections.
 
