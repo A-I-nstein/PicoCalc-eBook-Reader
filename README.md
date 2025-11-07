@@ -107,6 +107,14 @@ cargo run --release
 - **converter**: Stable and functional, including metadata extraction.
 - **firmware/reader**: Core features implemented; advanced features in progress.
 
+## Images
+![IMG20251107151840](https://github.com/user-attachments/assets/cb0c7a1c-bc2e-40bc-a6f6-5f63a42855f5)
+![IMG20251107152144](https://github.com/user-attachments/assets/31f742e1-75a6-4e18-95da-882ed87eda70)
+![IMG20251107152210](https://github.com/user-attachments/assets/2238db2f-a592-40c7-9c0b-8b8b3ff3d965)
+![IMG20251107152227](https://github.com/user-attachments/assets/a9366cc0-039a-4189-9110-72cc1146ae67)
+
+
+
 ## License
 
 MIT License.
