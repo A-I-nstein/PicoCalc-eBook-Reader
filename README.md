@@ -2,7 +2,7 @@
 
 ## Overview
 
-**PicoCalc eBook Reader** is a multi-component project for converting, storing, and reading eBooks in a custom `.book` format, optimized for embedded devices—specifically the **PicoCalc** from [Clockwork Pi](https://clockworkpi.com/). The project is written in Rust (converter) and C (firmware/reader).
+**PicoCalc eBook Reader** is a multi-component project for converting, storing, and reading eBooks in a custom `.book` format, optimized for embedded devices—specifically the **PicoCalc** from [Clockwork Pi](https://clockworkpi.com/). The project is written in Rust (converter) and C (firmware/reader). Please note that this application has been developed and built for the Raspberry Pi Pico 2 W only.
 
 This project is built on top of [BlairLeduc/picocalc-text-starter](https://github.com/BlairLeduc/picocalc-text-starter/tree/main), which serves as the base driver for hardware support (./firmware/drivers).
 
